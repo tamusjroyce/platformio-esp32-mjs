@@ -17,7 +17,6 @@
 #include <mjs.h>
 // #include <arm.h>
 #include <strings.h>
-#include <amr.h>
 
 #ifndef portTICK_PERIOD_MS
   #define portTICK_PERIOD_MS (( TickType_t) 1000 / configTICK_RATE_HZ)
@@ -32,18 +31,9 @@ void *my_dlsym(void *handle, const char *name) {
   return NULL;
 }
 
-void loop(struct amr_config *config)
-{
-  while (!amr_process(config))
-  {
-  }
-}
-
 void app_main()
 {
     printf("Hello world!\n");
-
-    struct amr_config config = amr_setup();
 
     struct mjs *mjs = mjs_create();
     mjs_set_ffi_resolver(mjs, my_dlsym);
@@ -62,14 +52,10 @@ void app_main()
     printf("%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
             (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
 
-    loop(&config);
-
     for (int i = 10; i >= 0; i--) {
         printf("Restarting in %d seconds...\n", i);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
-
-    amr_cleaning_up(&config);
 
     printf("Restarting now.\n");
     fflush(stdout);
